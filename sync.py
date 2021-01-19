@@ -9,10 +9,16 @@ def main():
     scope = "playlist-modify-public"
     sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
     user_id = sp.me()['id']
-    
-    # Create new playlist
+    created_playlist = ""
+
+    # Create new playlist (TODO - needs to be optional)
     sp.user_playlist_create(user_id, 'KEXP Import ' + datetime.date.today().strftime("%B %d, %Y"))
-    
+
+    # Grab ID from most recent playlist (TODO - clean this up at some point to query user for what playlist they want to use)
+    user_playlists = sp.current_user_playlists(limit=1)
+    for i, item in enumerate(user_playlists['items']):
+        created_playlist = item['id']
+
     # Parse KEXP output
     with open("KexpSavedTracks.html") as fp:
         soup = BeautifulSoup(fp, 'html.parser')
@@ -36,7 +42,7 @@ def main():
             track_id = potential_track_ids['tracks']['items'][0]['id']
             track_ids.append(track_id)
         except IndexError:
-            errors.append(track)
+            errors.append(track + " - " + artist)
 
     # Write to file missing tracks
     with open("errors.txt", "w") as outfile:
@@ -46,7 +52,7 @@ def main():
         #can't be a string...
         test = []
         test.append(id)
-        sp.playlist_add_items("25AR4X93EsmDsJS5VpqwAE", test) #hardcoded playlist
+        sp.playlist_add_items(created_playlist, test) #hardcoded playlist
 
 if __name__ == '__main__':
     main()
