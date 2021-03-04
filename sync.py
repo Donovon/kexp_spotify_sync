@@ -13,6 +13,7 @@ def main():
 
     # Create new playlist (TODO - needs to be optional)
     sp.user_playlist_create(user_id, 'KEXP Import ' + datetime.date.today().strftime("%B %d, %Y"))
+    print("Creating playlist with name: KEXP Import " + datetime.date.today().strftime("%B %d, %Y"))
 
     # Grab ID from most recent playlist (TODO - clean this up at some point to query user for what playlist they want to use)
     user_playlists = sp.current_user_playlists(limit=1)
@@ -34,6 +35,7 @@ def main():
     artists = [sub_list[1] for sub_list in data[1:]]
 
     # Find Spotify track ID for each track, add to playlist
+    print("Adding tracks...")
     track_ids = []
     errors = []
     for track, artist in zip(tracks, artists):
@@ -53,6 +55,7 @@ def main():
         test = []
         test.append(id)
         sp.playlist_add_items(created_playlist, test) #hardcoded playlist
+    print("Playlist created. Missing songs can be found in errors.txt")
 
 if __name__ == '__main__':
     main()
